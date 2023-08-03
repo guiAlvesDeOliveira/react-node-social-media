@@ -1,18 +1,28 @@
 import './post.css';
 import {MoreVert} from "@mui/icons-material";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import axios from "axios";
 import {format} from 'timeago.js';
 import {Link} from "react-router-dom";
+import {AuthContext} from "../../context/AuthContext";
 
 export default function Post({post}) {
     const PF = process.env.REACT_APP_PUBLIC_FOLDER;
     const [like, setLike] = useState(post.likes.length);
     const [isLiked, setIsLiked] = useState(false);
     const [user, setUser] = useState({});
+    const {user:currentUser} = useContext(AuthContext);
 
+    useEffect( () => {
+        setIsLiked(post.likes.includes(currentUser._id));
+     },[currentUser._id, post.likes])
 
     const likeHandler = () => {
+        try {
+            axios.put('/posts/'+post._id+'/like', {userId: currentUser._id});
+        }catch (err) {
+
+        }
         setLike(isLiked ? like - 1 : like + 1);
         setIsLiked(!isLiked)
     }
